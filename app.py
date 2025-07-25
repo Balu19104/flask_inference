@@ -83,18 +83,32 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
 from flask_cors import CORS
 import os
+import requests
 
+# Constants
+MODEL_PATH = 'plant_diseases.h5'
+GDRIVE_MODEL_URL = "https://drive.google.com/uc?export=download&id=1zNhFMKgJcLWeVQr-eRy8E23QFDWNWDiT"
+
+# Ensure model exists
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        print("🔽 Downloading model from Google Drive...")
+        response = requests.get(GDRIVE_MODEL_URL)
+        with open(MODEL_PATH, 'wb') as f:
+            f.write(response.content)
+        print("✅ Model downloaded.")
+
+download_model()
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
 # Load model
-MODEL_PATH = 'plant_diseases.h5'
 print("🔍 Loading model...")
 model = load_model(MODEL_PATH)
 print("✅ Model loaded.")
@@ -118,12 +132,14 @@ class_labels = [
     'Tomate: Healthy'
 ]
 
-# Image preprocessing function
+# Preprocessing
 def preprocess_image(image_bytes, target_size=(224, 224)):
-    image = Image.open(io.BytesIO(image_bytes)).convert('L')  # grayscale
+    try:
+        image = Image.open(io.BytesIO(image_bytes)).convert('L')  # grayscale
+    except UnidentifiedImageError:
+        raise ValueError("Invalid image format.")
     image = cv2.resize(np.array(image), target_size)
-    image = img_to_array(image)
-    image = image / 255.0
+    image = img_to_array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     return image
 
@@ -148,9 +164,11 @@ def predict():
 
         return jsonify({
             'predicted_class': predicted_label,
-            'confidence': round(max_confidence , 2)
+            'confidence': round(max_confidence, 2)
         })
 
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'Inference failed: ' + str(e)}), 500
 
@@ -158,5 +176,3 @@ def predict():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5050))
     app.run(host='0.0.0.0', port=port)
-
-
