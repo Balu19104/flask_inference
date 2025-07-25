@@ -1,17 +1,24 @@
-# Dockerfile
-
+# Use a lightweight Python image
 FROM python:3.10-slim
 
+# Set working directory
 WORKDIR /app
 
-COPY . /app
+# Install system dependencies required for OpenCV and general ML
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
+# Copy all project files to the container
+COPY . .
+
+# Upgrade pip and install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-
-# Expose port for Render (can be any, but 10000+ is safe)
+# Expose the port your app runs on
 EXPOSE 5050
 
-# Run your app
+# Run the Flask application
 CMD ["python", "app.py"]
