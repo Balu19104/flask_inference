@@ -9,7 +9,7 @@ Jinja2==3.1.5
 keras==2.13.1
 Keras-Applications==1.0.6
 Keras-Preprocessing==1.0.5
-tensorflow==1.15.5
+tensorflow==1.15.2
 Werkzeug==3.0.6
 future==0.18.3
 numpy==1.22.0
