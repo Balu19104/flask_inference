@@ -94,14 +94,16 @@ def predict():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'Inference failed: ' + str(e)}), 500
+# ... (existing imports, model loading, and functions)
 
-# Start the server
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5050))
-    app.run(host='0.0.0.0', port=port)
 @app.route('/')
 def index():
     return '''
     <h2>🌾 CropAI Backend is Live!</h2>
     <p>Use the <code>/predict</code> endpoint with a POST request to classify plant leaf diseases.</p>
     '''
+
+# Start the server
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5050))
+    app.run(host='0.0.0.0', port=port)
