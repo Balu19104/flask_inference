@@ -30,6 +30,8 @@ download_model()
 # Initialize Flask app
 app = Flask(__name__)
 # CORS(app)
+from datetime import timedelta
+
 CORS(app, supports_credentials=True, resources={
     r"/predict": {
         "origins": "https://frontend-for-crop-ai-react-app.vercel.app",
@@ -37,6 +39,7 @@ CORS(app, supports_credentials=True, resources={
         "allow_headers": ["Content-Type"]
     }
 })
+
 
 # Load model
 print("🔍 Loading model...")
