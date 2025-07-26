@@ -99,3 +99,9 @@ def predict():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5050))
     app.run(host='0.0.0.0', port=port)
+@app.route('/')
+def index():
+    return '''
+    <h2>🌾 CropAI Backend is Live!</h2>
+    <p>Use the <code>/predict</code> endpoint with a POST request to classify plant leaf diseases.</p>
+    '''
